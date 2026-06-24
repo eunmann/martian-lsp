@@ -2,7 +2,7 @@
   "name": "martian-lsp",
   "displayName": "Martian (MRO)",
   "description": "Language server client for the Martian (.mro) pipeline language.",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "publisher": "eunmann",
   "license": "MIT",
   "repository": {
