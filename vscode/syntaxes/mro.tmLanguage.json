@@ -1,0 +1,128 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Martian",
+  "scopeName": "source.mro",
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#include" },
+    { "include": "#declarations" },
+    { "include": "#keywords" },
+    { "include": "#types" },
+    { "include": "#constants" },
+    { "include": "#numbers" },
+    { "include": "#strings" },
+    { "include": "#operators" }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.number-sign.mro",
+          "match": "#.*$"
+        }
+      ]
+    },
+    "include": {
+      "match": "(@include)\\s+(\"[^\"]*\")",
+      "captures": {
+        "1": { "name": "keyword.control.import.mro" },
+        "2": { "name": "string.quoted.double.mro" }
+      }
+    },
+    "declarations": {
+      "patterns": [
+        {
+          "match": "\\b(stage|pipeline|struct)\\s+([A-Za-z_]\\w*)",
+          "captures": {
+            "1": { "name": "keyword.other.mro" },
+            "2": { "name": "entity.name.type.mro" }
+          }
+        },
+        {
+          "match": "\\b(filetype)\\s+([A-Za-z_][\\w.]*)",
+          "captures": {
+            "1": { "name": "keyword.other.mro" },
+            "2": { "name": "entity.name.type.mro" }
+          }
+        },
+        {
+          "match": "\\b(call)\\s+(?:(local|preflight|volatile)\\s+)*([A-Za-z_]\\w*)(?:\\s+(as)\\s+([A-Za-z_]\\w*))?",
+          "captures": {
+            "1": { "name": "keyword.control.mro" },
+            "2": { "name": "storage.modifier.mro" },
+            "3": { "name": "entity.name.function.mro" },
+            "4": { "name": "keyword.control.mro" },
+            "5": { "name": "variable.other.mro" }
+          }
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.mro",
+          "match": "\\b(call|return|self|as|split|using|retain)\\b"
+        },
+        {
+          "name": "keyword.other.mro",
+          "match": "\\b(stage|pipeline|struct|filetype|in|out|src)\\b"
+        },
+        {
+          "name": "support.function.builtin.mro",
+          "match": "\\b(py|exec|comp|compiled)\\b"
+        },
+        {
+          "name": "storage.modifier.mro",
+          "match": "\\b(local|preflight|volatile|disabled|strict|mem_gb|memgb|vmem_gb|vmemgb|threads|special)\\b"
+        }
+      ]
+    },
+    "types": {
+      "patterns": [
+        {
+          "name": "storage.type.mro",
+          "match": "\\b(int|float|string|bool|path|file|map)\\b"
+        }
+      ]
+    },
+    "constants": {
+      "patterns": [
+        {
+          "name": "constant.language.boolean.mro",
+          "match": "\\b(true|false)\\b"
+        },
+        {
+          "name": "constant.language.null.mro",
+          "match": "\\b(null)\\b"
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.float.mro",
+          "match": "-?\\b\\d+(\\.\\d+)?([eE][+-]?\\d+)?\\b"
+        }
+      ]
+    },
+    "strings": {
+      "name": "string.quoted.double.mro",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        {
+          "name": "constant.character.escape.mro",
+          "match": "\\\\(?:[abfnrtv\\\\\"]|[0-7]{3}|x[0-9A-Fa-f]{2}|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})"
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "name": "keyword.operator.mro",
+          "match": "(=|\\*|\\.|:|<|>)"
+        }
+      ]
+    }
+  }
+}

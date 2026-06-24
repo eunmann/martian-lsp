@@ -8,10 +8,15 @@ import {
 } from 'vscode-languageclient/node';
 
 let client: LanguageClient | undefined;
+let log: vscode.OutputChannel;
 
 const RELEASE_BASE = 'https://github.com/eunmann/martian-lsp/releases/latest/download';
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
+  log = vscode.window.createOutputChannel('Martian LSP');
+  context.subscriptions.push(log);
+  log.appendLine(`activating: platform=${process.platform} arch=${process.arch}`);
+
   const cfg = vscode.workspace.getConfiguration('martian');
   const mroPaths = cfg.get<string[]>('mroPaths', []);
 
@@ -19,20 +24,31 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   try {
     command = await resolveServer(context, cfg);
   } catch (err) {
-    vscode.window.showErrorMessage(
-      `Martian LSP: ${err instanceof Error ? err.message : String(err)}`,
-    );
+    const msg = err instanceof Error ? err.message : String(err);
+    log.appendLine(`failed to resolve server: ${msg}`);
+    vscode.window.showErrorMessage(`Martian LSP: ${msg}`);
     return;
   }
+  log.appendLine(`server binary: ${command}`);
 
   const serverOptions: ServerOptions = { command, args: [] };
   const clientOptions: LanguageClientOptions = {
     documentSelector: [{ scheme: 'file', language: 'mro' }],
     initializationOptions: { mroPaths },
+    outputChannel: log,
   };
 
   client = new LanguageClient('martian', 'Martian LSP', serverOptions, clientOptions);
-  await client.start();
+  try {
+    await client.start();
+    log.appendLine('language client started');
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    log.appendLine(`failed to start language client: ${msg}`);
+    vscode.window.showErrorMessage(
+      `Martian LSP failed to start (${msg}). See the "Martian LSP" output channel.`,
+    );
+  }
 }
 
 export function deactivate(): Thenable<void> | undefined {
