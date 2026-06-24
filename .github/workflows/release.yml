@@ -40,6 +40,10 @@ jobs:
 
   vscode:
     runs-on: ubuntu-latest
+    # secrets cannot be referenced in `if:`, so hoist them into env and gate on env.
+    env:
+      OVSX_TOKEN: ${{ secrets.OVSX_TOKEN }}
+      VSCE_PAT: ${{ secrets.VSCE_PAT }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -59,14 +63,10 @@ jobs:
           files: martian-lsp-*.vsix
           fail_on_unmatched_files: true
       - name: publish to Open VSX (if token set)
-        if: ${{ secrets.OVSX_TOKEN != '' }}
+        if: ${{ env.OVSX_TOKEN != '' }}
         working-directory: vscode
-        env:
-          OVSX_TOKEN: ${{ secrets.OVSX_TOKEN }}
         run: npx ovsx publish "../martian-lsp-${GITHUB_REF_NAME}.vsix" -p "$OVSX_TOKEN"
       - name: publish to VS Code Marketplace (if token set)
-        if: ${{ secrets.VSCE_PAT != '' }}
+        if: ${{ env.VSCE_PAT != '' }}
         working-directory: vscode
-        env:
-          VSCE_PAT: ${{ secrets.VSCE_PAT }}
         run: npx @vscode/vsce publish --packagePath "../martian-lsp-${GITHUB_REF_NAME}.vsix" -p "$VSCE_PAT"
