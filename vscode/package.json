@@ -2,20 +2,38 @@
   "name": "martian-lsp",
   "displayName": "Martian (MRO)",
   "description": "Language server client for the Martian (.mro) pipeline language.",
-  "version": "0.0.1",
-  "publisher": "unmannsystems",
+  "version": "0.1.0",
+  "publisher": "eunmann",
   "license": "MIT",
-  "engines": { "vscode": "^1.85.0" },
-  "categories": ["Programming Languages"],
-  "activationEvents": ["onLanguage:mro"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eunmann/martian-lsp"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "activationEvents": [
+    "onLanguage:mro"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "languages": [
       {
         "id": "mro",
-        "aliases": ["Martian", "mro"],
-        "extensions": [".mro"],
-        "filenames": ["_invocation", "_mrosource"],
+        "aliases": [
+          "Martian",
+          "mro"
+        ],
+        "extensions": [
+          ".mro"
+        ],
+        "filenames": [
+          "_invocation",
+          "_mrosource"
+        ],
         "configuration": "./language-configuration.json"
       }
     ],
@@ -29,7 +47,9 @@
         },
         "martian.mroPaths": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "default": [],
           "description": "Extra MRO include search directories (MROPATH)."
         }

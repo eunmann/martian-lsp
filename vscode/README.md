@@ -14,9 +14,23 @@ You don't need Go or anything on your PATH.
 Override with the `martian.serverPath` setting if you want a specific binary
 (e.g. one you built with `make install`, or `go install github.com/eunmann/martian-lsp/cmd/mrlsp@latest`).
 
-> Not yet on the VS Code Marketplace. For now, install the packaged extension:
-> download the `.vsix` from Releases (or build it — see below) and run
-> *Extensions: Install from VSIX…*.
+### Install the extension
+
+Until it's on a marketplace, install the packaged `.vsix` attached to each
+[release](https://github.com/eunmann/martian-lsp/releases):
+
+```sh
+# download martian-lsp-vX.Y.Z.vsix from the release, then:
+code --install-extension martian-lsp-vX.Y.Z.vsix
+```
+
+…or in the GUI: Extensions view → `…` → **Install from VSIX…**.
+
+Marketplace listings are planned: once published you'll be able to
+`ext install eunmann.martian-lsp` (VS Code Marketplace) or install from Open VSX
+(VSCodium / Cursor / Windsurf). The release workflow already builds the `.vsix`
+and will publish to both automatically when the `VSCE_PAT` / `OVSX_TOKEN`
+repository secrets are set.
 
 ## Build the extension
 
