@@ -1,0 +1,19 @@
+# Cross-file example. ALIGN is declared in dna.mro (via @include below).
+#
+# Put the cursor on `ALIGN` (the call) or on `ALIGN.aligned` and press grd:
+# definition jumps into dna.mro. Hover (K) shows the stage signature too.
+
+@include "dna.mro"
+
+pipeline ALIGNER(
+    in  fastq reads,
+    out bam   aligned,
+)
+{
+    call ALIGN(
+        reads = self.reads,
+    )
+    return (
+        aligned = ALIGN.aligned,
+    )
+}

@@ -1,0 +1,28 @@
+# This file intentionally contains an error to demonstrate live diagnostics.
+#
+# The `return` below wires `result` to MAKE.nonexistent, but MAKE has no output
+# named `nonexistent`. You should see an error squiggle on that line; navigate
+# diagnostics with [d and ]d, and view it with vim.diagnostic.open_float.
+#
+# Fix it (change `nonexistent` to `result`) and the squiggle clears on save/edit.
+
+filetype txt;
+
+stage MAKE(
+    in  int n,
+    out txt result,
+    src py  "stages/make",
+)
+
+pipeline BROKEN(
+    in  int n,
+    out txt result,
+)
+{
+    call MAKE(
+        n = self.n,
+    )
+    return (
+        result = MAKE.nonexistent,
+    )
+}

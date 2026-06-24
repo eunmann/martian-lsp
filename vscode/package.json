@@ -1,0 +1,52 @@
+{
+  "name": "martian-lsp",
+  "displayName": "Martian (MRO)",
+  "description": "Language server client for the Martian (.mro) pipeline language.",
+  "version": "0.0.1",
+  "publisher": "unmannsystems",
+  "license": "MIT",
+  "engines": { "vscode": "^1.85.0" },
+  "categories": ["Programming Languages"],
+  "activationEvents": ["onLanguage:mro"],
+  "main": "./out/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "mro",
+        "aliases": ["Martian", "mro"],
+        "extensions": [".mro"],
+        "filenames": ["_invocation", "_mrosource"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "configuration": {
+      "title": "Martian",
+      "properties": {
+        "martian.serverPath": {
+          "type": "string",
+          "default": "mrlsp",
+          "description": "Path to the mrlsp language server binary."
+        },
+        "martian.mroPaths": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": [],
+          "description": "Extra MRO include search directories (MROPATH)."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "vscode:prepublish": "tsc -p ./"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.4.0"
+  }
+}

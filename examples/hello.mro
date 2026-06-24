@@ -1,0 +1,37 @@
+# Example Martian pipeline for exercising the martian-lsp features.
+#
+#   gO   -> document symbols (outline of stages, pipelines, params, calls)
+#   K    -> hover (signatures, param types + help)
+#   grd  -> go-to-definition
+#
+# Try grd on `HELLO` (the call), on `HELLO.greeting`, and on `self.name`.
+
+filetype txt;
+
+stage HELLO(
+    in  string name,
+    out string greeting,
+    src py     "stages/hello",
+)
+
+stage SHOUT(
+    in  string greeting,
+    out txt    loud,
+    src py     "stages/shout",
+)
+
+pipeline HELLO_WORLD(
+    in  string name,
+    out txt    loud,
+)
+{
+    call HELLO(
+        name = self.name,
+    )
+    call SHOUT(
+        greeting = HELLO.greeting,
+    )
+    return (
+        loud = SHOUT.loud,
+    )
+}

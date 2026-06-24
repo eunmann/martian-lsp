@@ -1,0 +1,11 @@
+# Shared declarations, pulled in by aligner.mro via @include.
+# Cross-file go-to-definition lands here.
+
+filetype fastq;
+filetype bam;
+
+stage ALIGN(
+    in  fastq reads,
+    out bam   aligned,
+    src py    "stages/align",
+)
