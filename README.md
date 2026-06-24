@@ -53,11 +53,46 @@ vim.lsp.config('martian', {
 Workspace features search the workspace folders, those `mroPaths`, and the
 directories of open files.
 
-Planned (not yet implemented): `using(...)` member completion, nested
-struct-member completion, and more code actions (add-missing-arguments,
-add-`@include`).
+Planned (not yet implemented): `using(...)` member completion and nested
+struct-member completion.
 
-## Build
+## Install
+
+### The server (`mrlsp`)
+
+```sh
+go install github.com/eunmann/martian-lsp/cmd/mrlsp@latest
+```
+
+…or download a prebuilt binary for your platform from
+[Releases](https://github.com/eunmann/martian-lsp/releases) and put it on your
+PATH. (VS Code users can skip this — the extension auto-downloads it.)
+
+### Neovim (0.11+)
+
+Install `mrlsp` (above), then add to your config:
+
+```lua
+vim.filetype.add({ extension = { mro = 'mro' } })
+vim.lsp.config('martian', {
+  cmd = { 'mrlsp' },
+  filetypes = { 'mro' },
+  root_markers = { '.git' },
+  -- init_options = { mroPaths = { '/abs/path/to/shared/mros' } },
+})
+vim.lsp.enable('martian')
+```
+
+For tree-sitter highlighting, also install
+[`tree-sitter-martian`](https://github.com/eunmann/tree-sitter-martian).
+
+### VS Code
+
+Install the extension (see [`vscode/`](vscode)); it auto-downloads the matching
+`mrlsp` on first use. Marketplace listing is planned; for now install the
+packaged `.vsix` from Releases or build it from `vscode/`.
+
+## Build (from source)
 
 Requires Go 1.26+.
 
