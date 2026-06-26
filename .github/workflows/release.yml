@@ -19,7 +19,7 @@ jobs:
           - { goos: darwin, goarch: arm64 }
           - { goos: windows, goarch: amd64 }
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
@@ -45,10 +45,10 @@ jobs:
       OVSX_TOKEN: ${{ secrets.OVSX_TOKEN }}
       VSCE_PAT: ${{ secrets.VSCE_PAT }}
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
         with:
-          node-version: "20"
+          node-version: "22"
       - name: package .vsix
         working-directory: vscode
         run: |
