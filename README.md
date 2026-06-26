@@ -1,15 +1,12 @@
 # martian-lsp
 
 A Language Server for the [Martian](https://martian-lang.org) (`.mro`) pipeline
-language. It reuses Martian's own parser and type-checker
-(`github.com/martian-lang/martian/martian/syntax`) so its understanding of a
-pipeline matches `mro check` exactly.
+language ([martian-lang/martian](https://github.com/martian-lang/martian)). It
+reuses Martian's own parser and type-checker
+([`martian/syntax`](https://github.com/martian-lang/martian/tree/master/martian/syntax)),
+so its diagnostics match `mro check`.
 
-It lives in a **separate repo on purpose**: the Martian core is intentionally
-kept light, and consuming the parser as a Go module means zero code is copied
-into — or maintained against — that repo.
-
-## Features (v1)
+## Features
 
 | Feature | Notes |
 |---|---|
@@ -17,11 +14,11 @@ into — or maintained against — that repo.
 | **Document symbols** | Outline of stages, pipelines, their params and calls. |
 | **Hover** | Signature of a stage/pipeline; type + help text of a param or reference. |
 | **Go-to-definition** | Jump from `STAGE.output` / `self.input` / a call to its declaration, across `@include` files. |
-| **Find references** | All uses of a callable, input, or output (current document). |
-| **Rename** | Rename a callable/param everywhere it's used, including call-site bindings (current document). |
+| **Find references** | All uses of a callable, input, or output, workspace-wide. |
+| **Rename** | Rename a callable/param everywhere it's used, including call-site bindings, workspace-wide. |
 | **Formatting** | Canonical `mro` formatting of the whole document. |
 | **Semantic tokens** | Server-driven highlighting (callables, parameters) — consistent across LSP clients. |
-| **Completion** | Context-aware: keywords, types, `src` langs, callable names, call input params, `self.` inputs, `CALL.` outputs. Works mid-edit on unparseable buffers (last-good-AST snapshot + pure lexical context). Triggers on `.`. |
+| **Completion** | Context-aware: keywords, types, `src` langs, callable names, call input params, `self.` inputs, `CALL.` outputs. Works mid-edit on unparseable buffers. Triggers on `.`. |
 | **Signature help** | Inside `call X(`, shows X's input signature with the active argument highlighted. Triggers on `(` and `,`. |
 | **Document highlight** | Highlights every occurrence of the symbol under the cursor. |
 | **Prepare rename** | Validates the rename target before prompting. |
@@ -55,13 +52,10 @@ vim.lsp.config('martian', {
 `@include "..."` paths are resolved against, in order:
 
 1. the including file's own directory;
-2. the nearest ancestor **`mro/`** directory — Martian projects keep pipelines
-   under an `mro/` root and write includes relative to it, so this works with no
-   configuration even when the editor is opened at the repository root;
-3. the configured `mroPaths` (relative entries are resolved against the
-   workspace root, so `mroPaths = { 'mro' }` works);
-4. the **`MROPATH`** environment variable (the same mechanism Martian's own
-   `mrp`/`mrc` use).
+2. the nearest ancestor **`mro/`** directory;
+3. the configured `mroPaths` — relative entries resolve against the workspace
+   root, so `mroPaths = { 'mro' }` works;
+4. the **`MROPATH`** environment variable.
 
 Workspace features (cross-file references, rename, symbols) search the workspace
 folders, the `mroPaths`/`MROPATH` entries, and the directories of open files.
@@ -81,33 +75,20 @@ go install github.com/eunmann/martian-lsp/cmd/mrlsp@latest
 [Releases](https://github.com/eunmann/martian-lsp/releases) and put it on your
 PATH. (VS Code users can skip this — the extension auto-downloads it.)
 
-### Neovim (0.11+)
-
-Install `mrlsp` (above), then add to your config:
-
-```lua
-vim.filetype.add({ extension = { mro = 'mro' } })
-vim.lsp.config('martian', {
-  cmd = { 'mrlsp' },
-  filetypes = { 'mro' },
-  root_markers = { '.git' },
-  -- init_options = { mroPaths = { '/abs/path/to/shared/mros' } },
-})
-vim.lsp.enable('martian')
-```
-
-For tree-sitter highlighting, also install
-[`tree-sitter-martian`](https://github.com/eunmann/tree-sitter-martian).
-
 ### VS Code
 
-Install the extension (see [`vscode/`](vscode)); it auto-downloads the matching
-`mrlsp` on first use. Marketplace listing is planned; for now install the
-packaged `.vsix` from Releases or build it from `vscode/`.
+Install the extension from the packaged `.vsix` attached to each
+[release](https://github.com/eunmann/martian-lsp/releases) (Marketplace and Open
+VSX listings are planned). It bundles a TextMate grammar and auto-downloads the
+matching `mrlsp` on first use — no Go toolchain required. See
+[`vscode/README.md`](vscode/README.md) for details.
+
+Then configure your editor — see [Editor setup](#editor-setup) below for Neovim
+and VS Code.
 
 ## Build (from source)
 
-Requires Go 1.26+.
+Requires Go 1.26.4+ (matching the `go` directive in `go.mod`).
 
 ```sh
 make build          # produces ./mrlsp
@@ -118,31 +99,32 @@ make lint-check     # golangci-lint, zero-issue CI gate
 make install        # installs to ~/.local/bin (override with PREFIX=)
 ```
 
-> The Martian parser is pinned by **commit** pseudo-version in `go.mod`
-> (`github.com/martian-lang/martian`'s `go.mod` has no `/v4` suffix, so tags don't
-> resolve as Go versions). To hack on the parser locally, add a `go.work` or a
-> `replace` pointing at a checkout. Bump the parser with
+> The Martian parser
+> ([martian-lang/martian](https://github.com/martian-lang/martian)) is pinned by
+> **commit** pseudo-version in `go.mod` (its `go.mod` has no `/v4` suffix, so tags
+> don't resolve as Go versions). To hack on the parser locally, add a `go.work` or
+> a `replace` pointing at a checkout. Bump the parser with
 > `go get github.com/martian-lang/martian@<commit>`.
 
-## CI & editors
+## CI
 
 - **PR validation** (`.github/workflows/pr-validation.yml`): on every push/PR —
   `go mod tidy` drift check, `govulncheck`, golangci-lint, build, `go test -race`,
   and the headless Neovim suite (parallel jobs).
 - **Releases** (`.github/workflows/release.yml`): tag `vX.Y.Z` to build
-  cross-platform `mrlsp` binaries and attach them to the GitHub release.
-- **VS Code** client in [`vscode/`](vscode) (`npm install && npm run compile`, then F5).
-- **Neovim** setup is documented below.
+  cross-platform `mrlsp` binaries plus the VS Code `.vsix` and attach them to the
+  GitHub release (publishing to the Marketplace / Open VSX when the
+  `VSCE_PAT` / `OVSX_TOKEN` secrets are set).
 
 ## Editor setup
 
 The server speaks LSP over stdio, so any LSP client works.
 
-### Neovim 0.12+ (native LSP API, no nvim-lspconfig)
+### Neovim 0.11+ (native LSP API, no nvim-lspconfig)
 
-Neovim 0.12 has a built-in LSP config API. Put this anywhere in your config that
-runs at startup (e.g. a file under `lua/custom/plugins/` on kickstart, which is
-`require`d automatically):
+Neovim 0.11 added a built-in LSP config API (`vim.lsp.config` / `vim.lsp.enable`).
+Put this anywhere in your config that runs at startup (e.g. a file under
+`lua/custom/plugins/` on kickstart, which is `require`d automatically):
 
 ```lua
 -- Recognize Martian sources and metadata files as filetype "mro".
@@ -159,10 +141,13 @@ vim.lsp.config('martian', {
 vim.lsp.enable 'martian'
 ```
 
-Default LSP keymaps then work in any `.mro` buffer: `K` (hover), `grn` (rename,
-not yet implemented), and your config's go-to-definition / document-symbol maps
+Default LSP keymaps then work in any `.mro` buffer: `K` (hover), `grn` (rename),
+`gra` (code action), and your config's go-to-definition / document-symbol maps
 (`grd` / `gO` on kickstart). Diagnostics appear automatically; navigate with
 `[d` / `]d`.
+
+For tree-sitter highlighting, also install
+[`tree-sitter-martian`](https://github.com/eunmann/tree-sitter-martian).
 
 Try it against the bundled [`examples/`](examples): open `examples/hello.mro`
 (hover/definition/symbols), `examples/diagnostics.mro` (a live error), and
@@ -170,10 +155,12 @@ Try it against the bundled [`examples/`](examples): open `examples/hello.mro`
 
 ### VS Code
 
-The existing `martian-lang` extension provides syntax highlighting; wiring it to
-launch `mrlsp` as a language client (via `vscode-languageclient`) is a small
-follow-up. Until then, any generic "start an LSP for this language" bridge
-extension pointed at the `mrlsp` binary with language id `mro` works.
+The extension in [`vscode/`](vscode) is a full language client: it bundles a
+TextMate grammar for `.mro` syntax highlighting and launches `mrlsp` (downloaded
+automatically on first use) over `vscode-languageclient`. Install it from the
+`.vsix` on a [release](https://github.com/eunmann/martian-lsp/releases), then open
+any `.mro` file. Configure extra include paths with the `martian.mroPaths`
+setting; see [`vscode/README.md`](vscode/README.md).
 
 ## Architecture
 
@@ -190,11 +177,6 @@ LSP client ──stdio/JSON-RPC──▶ cmd/mrlsp ──▶ internal/server (gl
                                                   │
                               github.com/martian-lang/martian/martian/syntax  (module dep)
 ```
-
-The Martian AST exposes start positions but not end ranges, and no public
-declaration walker; `internal/lang/index.go` and `ranges.go` synthesize token
-ranges from the document text and walk the exported AST (plus `syntax.WalkExp`
-for expressions).
 
 ## License
 

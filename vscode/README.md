@@ -46,8 +46,9 @@ Press F5 in VS Code to launch an Extension Development Host.
 ## Settings
 
 - `martian.serverPath` — path to the `mrlsp` binary (default: auto-download / `mrlsp` on PATH).
-- `martian.mroPaths` — extra MRO include search directories (MROPATH).
+- `martian.mroPaths` — extra MRO include search directories. Relative entries
+  resolve against the workspace root. The nearest ancestor `mro/` directory and
+  the `$MROPATH` environment variable are also searched automatically.
 
-> Basic syntax highlighting comes from the separate `martian-lang` TextMate
-> grammar; this extension adds the language-server features (server-driven
-> semantic tokens layer on top).
+> This extension bundles a TextMate grammar for `.mro` syntax highlighting; the
+> language server adds server-driven semantic-token highlighting on top.
