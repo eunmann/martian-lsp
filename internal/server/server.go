@@ -4,6 +4,9 @@
 package server
 
 import (
+	"os"
+	"path/filepath"
+
 	"github.com/eunmann/martian-lsp/internal/lang"
 
 	"github.com/tliron/glsp"
@@ -89,8 +92,11 @@ type initializeResult struct {
 
 func (s *Server) initialize(_ *glsp.Context, params *protocol.InitializeParams) (any, error) {
 	// Establish workspace roots and configured MROPATH for cross-file features.
+	// The effective MROPATH is the configured paths (relative entries resolved
+	// against the workspace roots) followed by any $MROPATH entries.
 	roots := workspaceRoots(params)
-	s.docs.SetMROPaths(mroPathsFromOptions(params.InitializationOptions))
+	configured := resolveMROPaths(mroPathsFromOptions(params.InitializationOptions), roots)
+	s.docs.SetMROPaths(append(configured, mroPathsFromEnv()...))
 	s.ws = lang.NewWorkspace(s.docs, roots)
 	s.watchFiles = clientSupportsFileWatching(params)
 
@@ -206,6 +212,33 @@ func mroPathsFromOptions(opts any) []string {
 	for _, v := range raw {
 		if s, ok := v.(string); ok {
 			out = append(out, s)
+		}
+	}
+
+	return out
+}
+
+// mroPathsFromEnv reads the $MROPATH environment variable (the mechanism
+// Martian's own tools use), split on the OS path-list separator.
+func mroPathsFromEnv() []string {
+	return filepath.SplitList(os.Getenv("MROPATH"))
+}
+
+// resolveMROPaths makes relative configured MROPATH entries absolute by joining
+// them against each workspace root, so a project-relative setting like ["mro"]
+// resolves against the project rather than the server's working directory.
+// Absolute entries pass through unchanged; relative entries with no roots are
+// kept as-is (best effort).
+func resolveMROPaths(paths, roots []string) []string {
+	out := make([]string, 0, len(paths))
+	for _, p := range paths {
+		if filepath.IsAbs(p) || len(roots) == 0 {
+			out = append(out, p)
+
+			continue
+		}
+		for _, r := range roots {
+			out = append(out, filepath.Join(r, p))
 		}
 	}
 

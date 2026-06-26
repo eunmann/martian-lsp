@@ -58,7 +58,7 @@
             "type": "string"
           },
           "default": [],
-          "description": "Extra MRO include search directories (MROPATH)."
+          "description": "Extra MRO include search directories. Relative paths (e.g. \"mro\") are resolved against the workspace root. The nearest ancestor \"mro\" directory and the $MROPATH environment variable are also searched automatically."
         }
       }
     }

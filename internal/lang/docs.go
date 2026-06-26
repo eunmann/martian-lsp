@@ -21,14 +21,60 @@ type Document struct {
 	Extra   []string // additional MRO include search paths (configured MROPATH)
 }
 
-// MROPaths returns the include search paths used when compiling this document:
-// the file's own directory followed by any configured MROPATH entries.
+// MROPaths returns the include search paths used when compiling this document,
+// in priority order:
+//
+//	1. the file's own directory;
+//	2. the nearest ancestor "mro" directory, if any — Martian projects keep
+//	   their pipelines under an mro/ root and write @include paths relative to
+//	   it, so this resolves them without explicit configuration;
+//	3. any configured MROPATH entries (from initializationOptions / $MROPATH).
+//
+// The result is de-duplicated, preserving the order above.
 func (d *Document) MROPaths() []string {
 	if d.Path == "" {
-		return d.Extra
+		return dedupePaths(d.Extra)
+	}
+	paths := make([]string, 0, len(d.Extra)+2) //nolint:mnd // dir + mro-root
+	paths = append(paths, filepath.Dir(d.Path))
+	if root := mroRootOf(d.Path); root != "" {
+		paths = append(paths, root)
+	}
+	paths = append(paths, d.Extra...)
+
+	return dedupePaths(paths)
+}
+
+// mroRootOf returns the nearest ancestor directory of path named "mro", or ""
+// if there is none. This is the conventional include root for Martian projects.
+func mroRootOf(path string) string {
+	dir := filepath.Dir(path)
+	for {
+		if filepath.Base(dir) == "mro" {
+			return dir
+		}
+		parent := filepath.Dir(dir)
+		if parent == dir { // reached the filesystem root
+			return ""
+		}
+		dir = parent
+	}
+}
+
+// dedupePaths returns in with empty strings and duplicates removed, preserving
+// first-seen order.
+func dedupePaths(in []string) []string {
+	seen := make(map[string]bool, len(in))
+	out := make([]string, 0, len(in))
+	for _, p := range in {
+		if p == "" || seen[p] {
+			continue
+		}
+		seen[p] = true
+		out = append(out, p)
 	}
 
-	return append([]string{filepath.Dir(d.Path)}, d.Extra...)
+	return out
 }
 
 // Store is a concurrency-safe set of open documents keyed by URI. It also caches
