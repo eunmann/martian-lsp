@@ -42,9 +42,9 @@ func lineMasked(line string, upto int) (bool, bool) {
 
 // parenFrame describes an open '(' encountered while scanning.
 type parenFrame struct {
-	isCall  bool   // a call argument list
-	isUsing bool   // a using(...) block
-	isDecl  bool   // a stage/pipeline/struct parameter list
+	isCall  bool     // a call argument list
+	isUsing bool     // a using(...) block
+	isDecl  bool     // a stage/pipeline/struct parameter list
 	callee  string   // for call frames, the callable (DecId — the name after `call`)
 	sawEq   bool     // an '=' has appeared since the last ',' or '(' at this level
 	commas  int      // number of ',' seen at this level (the active argument index)

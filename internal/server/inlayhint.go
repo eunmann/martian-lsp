@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/eunmann/martian-lsp/internal/lang"
-
 	"github.com/tliron/glsp"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )

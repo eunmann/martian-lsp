@@ -414,4 +414,3 @@ func firstSegment(path string) string {
 
 	return path
 }
-

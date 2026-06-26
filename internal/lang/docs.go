@@ -24,11 +24,11 @@ type Document struct {
 // MROPaths returns the include search paths used when compiling this document,
 // in priority order:
 //
-//	1. the file's own directory;
-//	2. the nearest ancestor "mro" directory, if any — Martian projects keep
-//	   their pipelines under an mro/ root and write @include paths relative to
-//	   it, so this resolves them without explicit configuration;
-//	3. any configured MROPATH entries (from initializationOptions / $MROPATH).
+//  1. the file's own directory;
+//  2. the nearest ancestor "mro" directory, if any — Martian projects keep
+//     their pipelines under an mro/ root and write @include paths relative to
+//     it, so this resolves them without explicit configuration;
+//  3. any configured MROPATH entries (from initializationOptions / $MROPATH).
 //
 // The result is de-duplicated, preserving the order above.
 func (d *Document) MROPaths() []string {

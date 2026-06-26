@@ -2,7 +2,6 @@ package lang
 
 import (
 	"github.com/martian-lang/martian/martian/syntax"
-
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 

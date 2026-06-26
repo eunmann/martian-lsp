@@ -15,7 +15,6 @@ import (
 	"time"
 
 	"github.com/eunmann/martian-lsp/internal/server"
-
 	"github.com/tliron/glsp"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
