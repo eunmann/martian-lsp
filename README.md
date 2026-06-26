@@ -50,8 +50,21 @@ vim.lsp.config('martian', {
 })
 ```
 
-Workspace features search the workspace folders, those `mroPaths`, and the
-directories of open files.
+### Include resolution
+
+`@include "..."` paths are resolved against, in order:
+
+1. the including file's own directory;
+2. the nearest ancestor **`mro/`** directory — Martian projects keep pipelines
+   under an `mro/` root and write includes relative to it, so this works with no
+   configuration even when the editor is opened at the repository root;
+3. the configured `mroPaths` (relative entries are resolved against the
+   workspace root, so `mroPaths = { 'mro' }` works);
+4. the **`MROPATH`** environment variable (the same mechanism Martian's own
+   `mrp`/`mrc` use).
+
+Workspace features (cross-file references, rename, symbols) search the workspace
+folders, the `mroPaths`/`MROPATH` entries, and the directories of open files.
 
 Planned (not yet implemented): `using(...)` member completion and nested
 struct-member completion.
