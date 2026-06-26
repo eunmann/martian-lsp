@@ -19,8 +19,8 @@ jobs:
           - { goos: darwin, goarch: arm64 }
           - { goos: windows, goarch: amd64 }
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
           cache: true
@@ -33,7 +33,7 @@ jobs:
           [ "${{ matrix.goos }}" = "windows" ] && out="$out.exe"
           go build -ldflags "-s -w -X github.com/eunmann/martian-lsp/internal/server.Version=${GITHUB_REF_NAME}" -o "$out" ./cmd/mrlsp
           echo "ARTIFACT=$out" >> "$GITHUB_ENV"
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         with:
           files: ${{ env.ARTIFACT }}
           fail_on_unmatched_files: true
@@ -45,8 +45,8 @@ jobs:
       OVSX_TOKEN: ${{ secrets.OVSX_TOKEN }}
       VSCE_PAT: ${{ secrets.VSCE_PAT }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: "20"
       - name: package .vsix
@@ -58,7 +58,7 @@ jobs:
           npx @vscode/vsce package "$version" --no-git-tag-version \
             --out "../martian-lsp-${GITHUB_REF_NAME}.vsix"
       - name: attach .vsix to release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: martian-lsp-*.vsix
           fail_on_unmatched_files: true

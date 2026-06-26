@@ -1,6 +1,6 @@
 module github.com/eunmann/martian-lsp
 
-go 1.26
+go 1.26.4
 
 require (
 	github.com/martian-lang/martian v0.0.0-20260506211707-4a558e7dd93b

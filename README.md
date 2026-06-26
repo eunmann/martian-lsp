@@ -126,8 +126,9 @@ make install        # installs to ~/.local/bin (override with PREFIX=)
 
 ## CI & editors
 
-- **CI** (`.github/workflows/ci.yml`): build, vet, `go test`, golangci-lint, and the
-  headless Neovim suite on every push/PR.
+- **PR validation** (`.github/workflows/pr-validation.yml`): on every push/PR —
+  `go mod tidy` drift check, `govulncheck`, golangci-lint, build, `go test -race`,
+  and the headless Neovim suite (parallel jobs).
 - **Releases** (`.github/workflows/release.yml`): tag `vX.Y.Z` to build
   cross-platform `mrlsp` binaries and attach them to the GitHub release.
 - **VS Code** client in [`vscode/`](vscode) (`npm install && npm run compile`, then F5).
