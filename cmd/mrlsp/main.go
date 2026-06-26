@@ -7,7 +7,6 @@ import (
 	"os"
 
 	"github.com/eunmann/martian-lsp/internal/server"
-
 	"github.com/tliron/commonlog"
 	_ "github.com/tliron/commonlog/simple"
 	glspserver "github.com/tliron/glsp/server"
