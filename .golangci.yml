@@ -2,6 +2,9 @@ version: "2"
 
 linters:
   default: all
+  enable:
+    # gomodguard v1 is deprecated since golangci-lint v2.12.0; use the v2 linter.
+    - gomodguard_v2
   disable:
     - lll
     - wsl
@@ -15,6 +18,8 @@ linters:
     - noinlineerr
     # LSP request handlers legitimately return (nil, nil) to mean "no result".
     - nilnil
+    # Deprecated v1 linter; replaced by gomodguard_v2 (enabled above).
+    - gomodguard
   settings:
     gomoddirectives:
       # We use a local `replace` for the Martian module during development.
